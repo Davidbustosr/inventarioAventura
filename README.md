@@ -51,32 +51,34 @@ Al iniciar sesión, el rol se guarda en `request.session['rol']`. Cada vista rev
 | Reservas | ✅ Ve todas, cambia estado y elimina | ❌ | Reserva, paga y cancela **sus** reservas |
 | Django Admin (`/admin/`) | ✅ | ❌ | ❌ |
 
-## Instalación
+## Cómo hacerlo andar (Mac o Windows)
 
-```bash
-# 1. Crear y activar el entorno virtual
-python3 -m venv venv
-source venv/bin/activate          # Windows: .\venv\Scripts\activate
+**Requisitos:** Python 3 y MySQL Server (con MySQL Workbench). Descomprime el proyecto, por ejemplo en el Escritorio.
 
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Crear la base de datos en MySQL (Workbench o consola)
-#    CREATE DATABASE inventarioAventura CHARACTER SET utf8mb4;
-#    Ajustar USER y PASSWORD en inventarioAventura/settings.py
-
-# 4. Opción A: crear las tablas y cargar los datos de prueba
-python manage.py migrate
-python manage.py poblar_datos
-
-#    Opción B: restaurar el respaldo incluido
-mysql -u root -p < respaldo_bd/inventarioAventura.sql
-
-# 5. Levantar el servidor
-python manage.py runserver
+**1. Crear la base de datos.** En MySQL Workbench ejecuta:
+```sql
+CREATE DATABASE inventarioAventura CHARACTER SET utf8mb4;
 ```
 
-Luego abre <http://127.0.0.1:8000/>.
+**2. Poner tu usuario y clave de MySQL** en `inventarioAventura/settings.py` (sección `DATABASES`, campos `USER` y `PASSWORD`). Por ejemplo, `root` y tu clave.
+
+**3. Abrir una terminal en la carpeta del proyecto** (donde está `manage.py`) y ejecutar:
+
+| Paso | Mac | Windows (PowerShell o CMD) |
+|---|---|---|
+| Ir a la carpeta | `cd ~/Desktop/inventarioAventura` | `cd %USERPROFILE%\Desktop\inventarioAventura` |
+| Crear entorno virtual | `python3 -m venv venv` | `python -m venv venv` |
+| Activarlo | `source venv/bin/activate` | `venv\Scripts\activate` |
+| Instalar librerías | `pip install -r requirements.txt` | `pip install -r requirements.txt` |
+| Crear las tablas | `python manage.py migrate` | `python manage.py migrate` |
+| Cargar datos de prueba | `python manage.py poblar_datos` | `python manage.py poblar_datos` |
+| Levantar el servidor | `python manage.py runserver` | `python manage.py runserver` |
+
+**4.** Abre <http://127.0.0.1:8000/> en el navegador.
+
+> Otra opción en lugar de `migrate` + `poblar_datos`: restaurar el respaldo `respaldo_bd/inventarioAventura.sql` desde Workbench (*Server > Data Import*).
+>
+> Si PowerShell no deja activar el entorno, ejecuta antes: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 ## Credenciales de prueba
 
