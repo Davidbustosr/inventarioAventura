@@ -1,0 +1,26 @@
+/* Colores propios del ecoparque sobre la plantilla SB Admin 2 */
+.bg-aventura {
+    background-color: #1f6f4a;
+    background-image: linear-gradient(180deg, #1f6f4a 10%, #0f4630 100%);
+    background-size: cover;
+}
+.btn-aventura { background: #1f6f4a; border-color: #1f6f4a; color: #fff; }
+.btn-aventura:hover { background: #0f4630; border-color: #0f4630; color: #fff; }
+.text-aventura { color: #1f6f4a !important; }
+
+/* Landing publica */
+.hero {
+    background: linear-gradient(rgba(10, 40, 25, .55), rgba(10, 40, 25, .75)),
+                linear-gradient(135deg, #2e8b57 0%, #1f6f4a 40%, #0f4630 100%);
+    color: #fff;
+    padding: 110px 0 90px;
+}
+.hero h1 { font-weight: 800; font-size: 3rem; }
+.tarjeta-exp { transition: transform .15s; }
+.tarjeta-exp:hover { transform: translateY(-4px); }
+.icono-cat { font-size: 2rem; color: #1f6f4a; }
+
+/* Formularios generados con {{ form }} */
+.form-check-input { margin-left: 0; position: static; margin-right: .4rem; }
+.errorlist { color: #e74a3b; list-style: none; padding-left: 0; font-size: .85rem; margin: .25rem 0 0; }
+.helptext, .form-text { font-size: .8rem; color: #858796; }

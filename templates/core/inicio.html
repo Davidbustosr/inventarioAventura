@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Aventuras del Sur | Ecoparque y Reserva Natural</title>
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/aventura.css' %}" rel="stylesheet">
+</head>
+<body class="bg-white">
+
+<!-- Barra de navegacion publica -->
+<nav class="navbar navbar-expand navbar-dark bg-aventura shadow">
+    <div class="container">
+        <a class="navbar-brand font-weight-bold" href="{% url 'inicio' %}">
+            <i class="fas fa-mountain"></i> Aventuras del Sur
+        </a>
+        <div class="ml-auto">
+            {% if user.is_authenticated %}
+                <span class="text-white-50 small mr-2 d-none d-md-inline">Hola, {{ request.session.nombre|default:user.username }}</span>
+                <a href="{% url 'dashboard' %}" class="btn btn-light btn-sm">Ir a mi panel</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Iniciar sesión</a>
+                <a href="{% url 'registro' %}" class="btn btn-light btn-sm">Crear cuenta</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+{% for m in messages %}
+<div class="container mt-3">
+    <div class="alert alert-{{ m.tags }} alert-dismissible fade show">{{ m }}
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div>
+</div>
+{% endfor %}
+
+<!-- Hero -->
+<header class="hero text-center">
+    <div class="container">
+        <h1>Ecoparque y Reserva Natural<br>"Aventuras del Sur"</h1>
+        <p class="lead mt-3 mb-4">Trekking, canopy, kayak y arriendo de equipos en plena naturaleza.</p>
+        <a href="{% if user.is_authenticated %}{% url 'catalogo' %}{% else %}{% url 'registro' %}{% endif %}"
+           class="btn btn-light btn-lg font-weight-bold text-aventura">
+            <i class="fas fa-hiking"></i> Reserva tu aventura
+        </a>
+    </div>
+</header>
+
+<!-- Categorias activas -->
+<section class="container py-5">
+    <h2 class="h3 text-center text-gray-800 font-weight-bold mb-4">Nuestras actividades</h2>
+    <div class="row">
+        {% for c in categorias %}
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 text-center p-3">
+                <div class="icono-cat mb-2">
+                    {% if c.nombre == 'Trekking' %}<i class="fas fa-hiking"></i>
+                    {% elif c.nombre == 'Canopy' %}<i class="fas fa-tree"></i>
+                    {% elif c.nombre == 'Kayak' %}<i class="fas fa-water"></i>
+                    {% else %}<i class="fas fa-campground"></i>{% endif %}
+                </div>
+                <div class="font-weight-bold text-gray-800">{{ c.nombre }}</div>
+                <div class="small text-gray-600">{{ c.descripcion }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Proximas experiencias (consulta al ORM en la vista) -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="h3 text-center text-gray-800 font-weight-bold mb-4">Próximas experiencias</h2>
+        <div class="row">
+            {% for e in destacadas %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card tarjeta-exp border-0 shadow h-100">
+                    <div class="card-body">
+                        <span class="badge badge-success mb-2">{{ e.categoria.nombre }}</span>
+                        <h5 class="font-weight-bold text-gray-800">{{ e.titulo }}</h5>
+                        <p class="small text-gray-600 mb-2"><i class="far fa-calendar"></i> {{ e.fecha|date:"d/m/Y H:i" }} hrs</p>
+                        <p class="h5 text-aventura font-weight-bold mb-0">${{ e.precio }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'detalle_experiencia' e.id %}" class="btn btn-aventura btn-sm btn-block">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12"><div class="alert alert-info text-center">Pronto publicaremos nuevas experiencias.</div></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<footer class="py-4 bg-aventura text-white-50 text-center small">
+    Ecoparque y Reserva Natural "Aventuras del Sur" &middot; Programación Back End 2026
+</footer>
+
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

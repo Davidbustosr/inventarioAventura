@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Acceso{% endblock %} | Aventuras del Sur</title>
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/aventura.css' %}" rel="stylesheet">
+</head>
+<body class="bg-aventura">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-7 col-md-9">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="p-5">
+                        <div class="text-center mb-3">
+                            <a href="{% url 'inicio' %}" class="text-aventura">
+                                <i class="fas fa-mountain fa-2x"></i>
+                                <div class="h5 font-weight-bold mt-2">Aventuras del Sur</div>
+                            </a>
+                        </div>
+                        {% for m in messages %}
+                        <div class="alert alert-{{ m.tags }} alert-dismissible fade show" role="alert">
+                            {{ m }}
+                            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                        </div>
+                        {% endfor %}
+                        {% block contenido %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+</body>
+</html>

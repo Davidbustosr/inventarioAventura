@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Mis reservas{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Mis reservas</h1>
+    <a href="{% url 'catalogo' %}" class="btn btn-aventura"><i class="fas fa-plus"></i> Nueva reserva</a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr><th>N°</th><th>Experiencia</th><th>Categoría</th><th>Fecha actividad</th><th>Valor</th>
+                    <th>Reservada el</th><th>Estado de pago</th><th class="text-center">Acciones</th></tr>
+                </thead>
+                <tbody>
+                {% for r in reservas %}
+                <tr>
+                    <td>{{ r.id }}</td>
+                    <td><a href="{% url 'detalle_experiencia' r.experiencia.id %}">{{ r.experiencia.titulo }}</a></td>
+                    <td>{{ r.experiencia.categoria.nombre }}</td>
+                    <td>{{ r.experiencia.fecha|date:"Y-m-d H:i" }}</td>
+                    <td>${{ r.experiencia.precio }}</td>
+                    <td>{{ r.fecha_inscripcion|date:"Y-m-d H:i" }}</td>
+                    <td><span class="badge badge-{% if r.estado_pago == 'CONFIRMADO' %}success{% else %}warning{% endif %}">{{ r.get_estado_pago_display }}</span></td>
+                    <td class="text-center text-nowrap">
+                        {% if r.estado_pago == 'PENDIENTE' %}
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalPagar{{ r.id }}"><i class="fas fa-credit-card"></i> Pagar</button>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalCancelar{{ r.id }}"><i class="fas fa-times"></i></button>
+                        {% else %}
+                        <span class="text-success small"><i class="fas fa-check-circle"></i> Pagada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% for r in reservas %}{% if r.estado_pago == 'PENDIENTE' %}
+<!-- Confirmacion de pago -->
+<div class="modal fade" id="modalPagar{{ r.id }}" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Confirmación de pago</h5>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+            Vas a pagar <strong>${{ r.experiencia.precio }}</strong> por <strong>{{ r.experiencia.titulo }}</strong>.
+            <br><small class="text-muted">(Pago simulado: la reserva pasará a estado Confirmado)</small>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'pagar_reserva' r.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Confirmar pago</button>
+            </form>
+        </div>
+    </div></div>
+</div>
+<!-- Cancelar reserva -->
+<div class="modal fade" id="modalCancelar{{ r.id }}" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Cancelar reserva</h5>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">¿Seguro que quieres cancelar tu reserva de <strong>{{ r.experiencia.titulo }}</strong>?</div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">No</button>
+            <form method="post" action="{% url 'cancelar_reserva' r.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Sí, cancelar</button>
+            </form>
+        </div>
+    </div></div>
+</div>
+{% endif %}{% endfor %}
+{% endblock %}

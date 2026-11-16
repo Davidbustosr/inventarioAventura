@@ -1,0 +1,17 @@
+{% extends 'base_login.html' %}
+{% block title %}Crear cuenta{% endblock %}
+{% block contenido %}
+<div class="text-center">
+    <h1 class="h4 text-gray-900 mb-1">¡Crea tu cuenta de turista!</h1>
+    <p class="small text-gray-600 mb-4">Con tu cuenta podrás reservar experiencias en el ecoparque.</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button class="btn btn-aventura btn-block" type="submit">Registrar cuenta</button>
+</form>
+<hr>
+<div class="text-center">
+    <a class="small" href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+</div>
+{% endblock %}

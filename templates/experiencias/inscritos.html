@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Grupo: {{ experiencia.titulo }}{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Detalle del grupo</h1>
+    <a href="{% url 'listar_experiencias' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<div class="card shadow mb-4 border-left-success">
+    <div class="card-body">
+        <h5 class="font-weight-bold text-gray-800 mb-1">{{ experiencia.titulo }}</h5>
+        <div class="small text-gray-600">
+            {{ experiencia.categoria.nombre }} &middot; {{ experiencia.fecha|date:"Y-m-d H:i" }} hrs &middot; ${{ experiencia.precio }}
+            &middot; Guía: {{ experiencia.creador.get_full_name|default:experiencia.creador.username }}
+        </div>
+        <div class="mt-2"><strong>{{ experiencia.inscritos }}</strong> inscritos de <strong>{{ experiencia.cupo_maximo }}</strong> cupos
+            ({{ experiencia.cupos_disponibles }} disponibles)</div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-bordered table-striped" width="100%">
+                <thead><tr><th>#</th><th>Turista</th><th>Email</th><th>Teléfono</th><th>Fecha inscripción</th><th>Estado de pago</th></tr></thead>
+                <tbody>
+                {% for i in inscripciones %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ i.usuario.get_full_name|default:i.usuario.username }}</td>
+                    <td>{{ i.usuario.email }}</td>
+                    <td>{{ i.usuario.perfil.telefono|default:"-" }}</td>
+                    <td>{{ i.fecha_inscripcion|date:"Y-m-d H:i" }}</td>
+                    <td><span class="badge badge-{% if i.estado_pago == 'CONFIRMADO' %}success{% else %}warning{% endif %}">{{ i.get_estado_pago_display }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

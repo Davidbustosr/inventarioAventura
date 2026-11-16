@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Catálogo{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-2 text-gray-800">Catálogo de actividades</h1>
+    <!-- Filtro por categoria: se envia por GET (?categoria=ID) -->
+    <form method="get" class="form-inline mb-2">
+        <select name="categoria" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+            <option value="">Todas las categorías</option>
+            {% for c in categorias %}
+            <option value="{{ c.id }}" {% if categoria_id == c.id|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if vistas %}
+<!-- Coleccion guardada en request.session['vistas_recientes'] -->
+<div class="card shadow-sm mb-4 border-left-info">
+    <div class="card-body py-2 small">
+        <i class="fas fa-history text-info"></i> <strong>Vistas recientemente en tu sesión:</strong>
+        {% for v in vistas %}
+            <a href="{% url 'detalle_experiencia' v.id %}" class="badge badge-light border ml-1">{{ v.titulo }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    {% for e in experiencias %}
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card tarjeta-exp shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge badge-success">{{ e.categoria.nombre }}</span>
+                    {% if e.id in mis_ids %}<span class="badge badge-primary"><i class="fas fa-check"></i> Ya reservada</span>{% endif %}
+                </div>
+                <h5 class="font-weight-bold text-gray-800">{{ e.titulo }}</h5>
+                <p class="small text-gray-600 mb-2">{{ e.descripcion|truncatechars:90 }}</p>
+                <div class="small"><i class="far fa-calendar text-aventura"></i> {{ e.fecha|date:"d/m/Y H:i" }} hrs</div>
+                <div class="small"><i class="fas fa-users text-aventura"></i> {{ e.cupos_disponibles }} cupos disponibles</div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <span class="h5 mb-0 font-weight-bold text-aventura">${{ e.precio }}</span>
+                <a href="{% url 'detalle_experiencia' e.id %}" class="btn btn-aventura btn-sm">Elegir ruta <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="alert alert-info">No hay experiencias disponibles con ese filtro.</div></div>
+    {% endfor %}
+</div>
+{% endblock %}

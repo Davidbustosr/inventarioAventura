@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Mi perfil{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-4 text-gray-800">Mi perfil</h1>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-aventura">Mis datos (base de datos)</h6></div>
+            <div class="card-body">
+                <p><strong>Usuario:</strong> {{ user.username }}</p>
+                <p><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Rol:</strong> {{ perfil.get_rol_display }}</p>
+                <p class="mb-0"><strong>Teléfono:</strong> {{ perfil.telefono|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <!-- Lo que esta guardado en la sesion actual -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-aventura">Datos guardados en mi sesión</h6></div>
+            <div class="card-body">
+                <p><strong>request.session.rol:</strong> {{ request.session.rol }}</p>
+                <p><strong>request.session.nombre:</strong> {{ request.session.nombre }}</p>
+                <p><strong>request.session.hora_ingreso:</strong> {{ request.session.hora_ingreso }}</p>
+                <p class="mb-0"><strong>request.session.vistas_recientes:</strong> {{ request.session.vistas_recientes }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

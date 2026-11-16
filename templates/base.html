@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Panel{% endblock %} | Aventuras del Sur</title>
+
+    <!-- Plantilla SB Admin 2 (Bootstrap 4) -->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <!-- DataTables (estilo Bootstrap 4) -->
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/aventura.css' %}" rel="stylesheet">
+</head>
+
+<body id="page-top">
+<div id="wrapper">
+
+    <!-- ===================== SIDEBAR (cambia segun el rol en la SESION) ===================== -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion bg-aventura" id="accordionSidebar">
+
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'inicio' %}">
+            <div class="sidebar-brand-icon"><i class="fas fa-mountain"></i></div>
+            <div class="sidebar-brand-text mx-2">Aventuras<br><small>del Sur</small></div>
+        </a>
+
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'dashboard' %}">
+                <i class="fas fa-fw fa-tachometer-alt"></i><span>Panel de control</span></a>
+        </li>
+
+        {% if request.session.rol == 'ADMIN' %}
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Administración</div>
+        <li class="nav-item"><a class="nav-link" href="{% url 'listar_usuarios' %}">
+            <i class="fas fa-fw fa-users"></i><span>Usuarios</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'listar_categorias' %}">
+            <i class="fas fa-fw fa-tags"></i><span>Categorías</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'listar_experiencias' %}">
+            <i class="fas fa-fw fa-hiking"></i><span>Experiencias</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'listar_reservas' %}">
+            <i class="fas fa-fw fa-ticket-alt"></i><span>Todas las reservas</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+            <i class="fas fa-fw fa-cogs"></i><span>Django Admin</span></a></li>
+        {% endif %}
+
+        {% if request.session.rol == 'GUIA' %}
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Guía / Operador</div>
+        <li class="nav-item"><a class="nav-link" href="{% url 'listar_experiencias' %}">
+            <i class="fas fa-fw fa-hiking"></i><span>Mis experiencias</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'crear_experiencia' %}">
+            <i class="fas fa-fw fa-plus-circle"></i><span>Nueva experiencia</span></a></li>
+        {% endif %}
+
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Ecoparque</div>
+        <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">
+            <i class="fas fa-fw fa-map-signs"></i><span>Catálogo de actividades</span></a></li>
+        {% if request.session.rol == 'TURISTA' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'mis_reservas' %}">
+            <i class="fas fa-fw fa-calendar-check"></i><span>Mis reservas</span></a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'mi_perfil' %}">
+            <i class="fas fa-fw fa-user"></i><span>Mi perfil</span></a></li>
+
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul>
+
+    <!-- ===================== CONTENIDO ===================== -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            <!-- Topbar: datos guardados en la sesion -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="d-none d-sm-inline text-gray-600 small">
+                    <i class="fas fa-clock"></i> Sesión iniciada: {{ request.session.hora_ingreso }}
+                </span>
+
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-700">
+                                {{ request.session.nombre }}
+                                {% if request.session.rol == 'ADMIN' %}<span class="badge badge-danger">Administrador</span>
+                                {% elif request.session.rol == 'GUIA' %}<span class="badge badge-success">Guía</span>
+                                {% else %}<span class="badge badge-warning">Turista</span>{% endif %}
+                            </span>
+                            <img class="img-profile rounded-circle" src="{% static 'img/undraw_profile.svg' %}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <a class="dropdown-item" href="{% url 'mi_perfil' %}">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Mi perfil</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Cerrar sesión</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="container-fluid">
+                <!-- Mensajes (django.contrib.messages) -->
+                {% for m in messages %}
+                <div class="alert alert-{{ m.tags }} alert-dismissible fade show" role="alert">
+                    {{ m }}
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+                {% endfor %}
+
+                {% block contenido %}{% endblock %}
+            </div>
+        </div>
+
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Ecoparque y Reserva Natural "Aventuras del Sur" &middot; Programación Back End 2026</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<!-- Modal de Cerrar sesion (el logout se hace por POST con csrf_token) -->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">¿Cerrar sesión?</h5>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">Se eliminará tu sesión actual y volverás a la página de inicio.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+    // Todas las tablas de listado tienen id="miTabla": aqui se activa DataTables en español
+    $(document).ready(function () {
+        $('#miTabla').DataTable({
+            "pageLength": 10,
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+            }
+        });
+    });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

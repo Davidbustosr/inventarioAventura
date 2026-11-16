@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Panel de control{% endblock %}
+{% block contenido %}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Panel de control</h1>
+    <span class="small text-gray-600">Rol en la sesión: <strong>{{ request.session.rol }}</strong></span>
+</div>
+
+{% if rol == 'ADMIN' %}
+<!-- ===================== ADMINISTRADOR ===================== -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Usuarios</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_usuarios }}</div>
+        </div></div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Experiencias / Categorías</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_experiencias }} / {{ total_categorias }}</div>
+        </div></div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Reservas (pendientes)</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_reservas }} ({{ pendientes }})</div>
+        </div></div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Recaudado (confirmadas)</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ recaudado }}</div>
+        </div></div>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-aventura">Últimas reservas del sistema</h6>
+        <a href="{% url 'listar_reservas' %}" class="small">Ver todas</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="thead-light"><tr><th>Turista</th><th>Experiencia</th><th>Fecha reserva</th><th>Estado</th></tr></thead>
+            <tbody>
+            {% for r in ultimas_reservas %}
+            <tr>
+                <td>{{ r.usuario.get_full_name|default:r.usuario.username }}</td>
+                <td>{{ r.experiencia.titulo }}</td>
+                <td>{{ r.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge badge-{% if r.estado_pago == 'CONFIRMADO' %}success{% else %}warning{% endif %}">{{ r.get_estado_pago_display }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% elif rol == 'GUIA' %}
+<!-- ===================== GUIA ===================== -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-success shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Mis experiencias</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_experiencias }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Próximas a realizarse</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ proximas }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Turistas inscritos</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_inscritos }}</div>
+        </div></div>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-aventura">Calendario de mis actividades</h6>
+        <a href="{% url 'crear_experiencia' %}" class="btn btn-aventura btn-sm"><i class="fas fa-plus"></i> Nueva</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="thead-light"><tr><th>Fecha</th><th>Experiencia</th><th>Inscritos / Cupo</th><th></th></tr></thead>
+            <tbody>
+            {% for e in mis_experiencias %}
+            <tr>
+                <td>{{ e.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ e.titulo }}</td>
+                <td>{{ e.inscritos }} / {{ e.cupo_maximo }}</td>
+                <td><a href="{% url 'inscritos_experiencia' e.id %}" class="btn btn-info btn-sm"><i class="fas fa-users"></i> Grupo</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted">Aún no registras experiencias.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<!-- ===================== TURISTA ===================== -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Mis reservas</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_reservas }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-success shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pagadas</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ confirmadas }}</div>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2"><div class="card-body">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pendientes de pago</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pendientes }}</div>
+        </div></div>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-aventura">Mis próximas aventuras</h6>
+        <a href="{% url 'catalogo' %}" class="btn btn-aventura btn-sm"><i class="fas fa-map-signs"></i> Ver catálogo</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="thead-light"><tr><th>Fecha</th><th>Experiencia</th><th>Estado de pago</th></tr></thead>
+            <tbody>
+            {% for r in proximas %}
+            <tr>
+                <td>{{ r.experiencia.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ r.experiencia.titulo }}</td>
+                <td><span class="badge badge-{% if r.estado_pago == 'CONFIRMADO' %}success{% else %}warning{% endif %}">{{ r.get_estado_pago_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted">No tienes reservas próximas.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

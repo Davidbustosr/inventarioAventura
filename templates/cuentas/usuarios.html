@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Gestión de usuarios</h1>
+    <a href="{% url 'crear_usuario' %}" class="btn btn-aventura"><i class="fas fa-user-plus"></i> Nuevo usuario</a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Usuario</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.get_full_name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>
+                        {% if u.perfil.rol == 'ADMIN' %}<span class="badge badge-danger">Administrador</span>
+                        {% elif u.perfil.rol == 'GUIA' %}<span class="badge badge-success">Guía</span>
+                        {% else %}<span class="badge badge-warning">Turista</span>{% endif %}
+                    </td>
+                    <td>{% if u.is_active %}Activo{% else %}<span class="text-danger">Inactivo</span>{% endif %}</td>
+                    <td class="text-center text-nowrap">
+                        <a href="{% url 'editar_usuario' u.id %}" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-pen"></i></a>
+                        {% if u != request.user %}
+                        <button class="btn btn-danger btn-sm" title="Eliminar" data-toggle="modal" data-target="#modalEliminar{{ u.id }}">
+                            <i class="fas fa-trash"></i></button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Un modal por fila: el id del modal lleva el id del usuario -->
+{% for u in usuarios %}
+<div class="modal fade" id="modalEliminar{{ u.id }}" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Eliminar usuario</h5>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+            ¿Está seguro de eliminar al usuario <strong>{{ u.username }}</strong>?
+            <br><small class="text-muted">También se borrarán sus experiencias y reservas.</small>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_usuario' u.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar</button>
+            </form>
+        </div>
+    </div></div>
+</div>
+{% endfor %}
+{% endblock %}

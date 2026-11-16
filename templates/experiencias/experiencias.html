@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Experiencias{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+        {% if request.session.rol == 'ADMIN' %}Gestión de experiencias (todas){% else %}Mis experiencias{% endif %}
+    </h1>
+    <a href="{% url 'crear_experiencia' %}" class="btn btn-aventura"><i class="fas fa-plus"></i> Nueva experiencia</a>
+</div>
+
+{% if request.session.rol == 'GUIA' %}
+<div class="alert alert-info small">
+    <i class="fas fa-info-circle"></i> Como guía solo ves las experiencias que tú registraste. Puedes crearlas y editarlas, pero no eliminarlas.
+</div>
+{% endif %}
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Título</th><th>Categoría</th><th>Fecha</th><th>Precio</th><th>Inscritos / Cupo</th>
+                    {% if request.session.rol == 'ADMIN' %}<th>Guía</th>{% endif %}
+                    <th>Estado</th><th class="text-center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for e in experiencias %}
+                <tr>
+                    <td>{{ e.id }}</td>
+                    <td>{{ e.titulo }}</td>
+                    <td>{{ e.categoria.nombre }}</td>
+                    <td>{{ e.fecha|date:"Y-m-d H:i" }}</td>
+                    <td>${{ e.precio }}</td>
+                    <td>{{ e.inscritos }} / {{ e.cupo_maximo }}</td>
+                    {% if request.session.rol == 'ADMIN' %}<td>{{ e.creador.get_full_name|default:e.creador.username }}</td>{% endif %}
+                    <td>{% if e.activa %}<span class="badge badge-success">Activa</span>{% else %}<span class="badge badge-secondary">Oculta</span>{% endif %}</td>
+                    <td class="text-center text-nowrap">
+                        <a href="{% url 'inscritos_experiencia' e.id %}" class="btn btn-info btn-sm" title="Ver grupo"><i class="fas fa-users"></i></a>
+                        <a href="{% url 'editar_experiencia' e.id %}" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-pen"></i></a>
+                        {% if request.session.rol == 'ADMIN' %}
+                        <button class="btn btn-danger btn-sm" title="Eliminar" data-toggle="modal" data-target="#modalEliminar{{ e.id }}"><i class="fas fa-trash"></i></button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if request.session.rol == 'ADMIN' %}
+{% for e in experiencias %}
+<div class="modal fade" id="modalEliminar{{ e.id }}" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Eliminar experiencia</h5>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+            ¿Está seguro de eliminar <strong>{{ e.titulo }}</strong>?
+            {% if e.inscritos %}<br><small class="text-danger">Tiene {{ e.inscritos }} reservas que también se eliminarán.</small>{% endif %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_experiencia' e.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar</button>
+            </form>
+        </div>
+    </div></div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

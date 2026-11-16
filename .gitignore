@@ -1,0 +1,8 @@
+# Entorno virtual (se crea con: python3 -m venv venv)
+venv/
+env/
+__pycache__/
+*.pyc
+.DS_Store
+db.sqlite3
+.claude/

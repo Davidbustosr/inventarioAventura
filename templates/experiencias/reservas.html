@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Todas las reservas{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-4 text-gray-800">Todas las reservas del sistema</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="miTabla" class="table table-bordered table-striped" width="100%">
+                <thead>
+                <tr><th>N°</th><th>Turista</th><th>Experiencia</th><th>Fecha actividad</th><th>Valor</th>
+                    <th>Reservada el</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                </thead>
+                <tbody>
+                {% for r in reservas %}
+                <tr>
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.usuario.get_full_name|default:r.usuario.username }}</td>
+                    <td>{{ r.experiencia.titulo }}</td>
+                    <td>{{ r.experiencia.fecha|date:"Y-m-d H:i" }}</td>
+                    <td>${{ r.experiencia.precio }}</td>
+                    <td>{{ r.fecha_inscripcion|date:"Y-m-d H:i" }}</td>
+                    <td><span class="badge badge-{% if r.estado_pago == 'CONFIRMADO' %}success{% else %}warning{% endif %}">{{ r.get_estado_pago_display }}</span></td>
+                    <td class="text-center text-nowrap">
+                        <form method="post" action="{% url 'cambiar_estado_reserva' r.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info btn-sm" title="Cambiar estado de pago"><i class="fas fa-exchange-alt"></i></button>
+                        </form>
+                        <button class="btn btn-danger btn-sm" title="Eliminar" data-toggle="modal" data-target="#modalEliminar{{ r.id }}"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% for r in reservas %}
+<div class="modal fade" id="modalEliminar{{ r.id }}" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Eliminar reserva</h5>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">¿Está seguro de eliminar la reserva N° {{ r.id }} de <strong>{{ r.usuario.username }}</strong> en <strong>{{ r.experiencia.titulo }}</strong>?</div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_reserva' r.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar</button>
+            </form>
+        </div>
+    </div></div>
+</div>
+{% endfor %}
+{% endblock %}
